@@ -1,4 +1,3 @@
-
 <%@tag description="base page template" pageEncoding="UTF-8"%>
 <%@attribute name="pageTitle"%>
 
@@ -11,5 +10,8 @@
 </head>
 <body>
 <jsp:doBody/>
+<jsp:include page="/WEB-INF/Pages/menu.jsp" />
+<main class="container-fluid mt-5">
+</main>
 </body>
 </html>
