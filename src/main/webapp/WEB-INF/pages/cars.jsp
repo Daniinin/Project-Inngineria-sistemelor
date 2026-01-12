@@ -1,24 +1,17 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@taglib prefix="t" tagdir="/WEB-INF/tags" %>
-<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
-<t:pageTemplate pageTitle="Cars">
-    <h1>Cars</h1>
-    <a class=" btn btn-primary btn-lg" href="${pageContext.request.contextPath}/AddCar", type="submit">Add Car</a>
-    <div class="container text-center">
-        <c:forEach var="car" items="${cars}">
-            <div class="row">
-                <div class="col">
-                        ${car.licensePlate}
-                </div>
-                <div class="col">
-                        ${car.parkingSpot}
-                </div>
-                <div class="col">
-                        ${car.ownerName}
-                </div>
-            </div>
-        </c:forEach>
-    </div>
-    <h5>Free parking spots: ${numberOfFreeParkingSpots}</h5>
-</t:pageTemplate>
+<!-- CARS -->
+<li class="nav-item">
+    <c:if test="${pageContext.request.isUserInRole('READ_CARS')}">
+        <a class="nav-link
+           ${pageContext.request.requestURI.substring(pageContext.request.requestURI.lastIndexOf("/")) eq '/cars.jsp' ? ' active' : ''}"
+           aria-current="page"
+           href="${pageContext.request.contextPath}/Cars">Cars</a>
+    </c:if>
+</li>
+<!--USERS-->
+<li class="nav-item">
+<c:if test="${pageContext.request.isUserInRole('READ_USERS')}">
+    <a class="nav-link
+           ${pageContext.request.requestURI.substring(pageContext.request.requestURI.lastIndexOf("/")) eq '/users.jsp' ? ' active' : ''}"
+       aria-current="page"
+       href="${pageContext.request.contextPath}/Users">Users</a>
+</c:if>
