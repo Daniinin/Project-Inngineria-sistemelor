@@ -5,5 +5,4 @@ import jakarta.ws.rs.core.Application;
 
 @ApplicationPath("/resources")
 public class ParkingLotApplication extends Application {
-    // No additional configuration needed
 }

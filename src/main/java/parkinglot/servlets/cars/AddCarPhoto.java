@@ -1,6 +1,5 @@
-package parkinglot.servlet.car;
+package parkinglot.servlets.cars;
 
-import jakarta.inject.Inject;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -11,6 +10,7 @@ import jakarta.servlet.http.Part;
 import parkinglot.common.CarDto;
 import parkinglot.ejb.CarsBean;
 
+import jakarta.inject.Inject;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -24,30 +24,43 @@ public class AddCarPhoto extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        // Get the car ID from the URL parameter
         Long carId = Long.parseLong(request.getParameter("id"));
+
+        // Get car details from database
         CarDto car = carsBean.findById(carId);
 
+        // Put car in request scope so JSP can access it
         request.setAttribute("car", car);
-        request.getRequestDispatcher("/WEB-INF/pages/car/addCarPhoto.jsp").forward(request, response);
+
+        // Forward to the JSP page (calea corectă!)
+        request.getRequestDispatcher("/WEB-INF/pages/cars/addCarPhoto.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        // Get the car ID from the form
         Long carId = Long.parseLong(request.getParameter("car_id"));
 
+        // Get the uploaded file
         Part filePart = request.getPart("file");
-        String filename = filePart.getSubmittedFileName();
-        String fileType = filePart.getContentType();
 
-        // Citește conținutul fișierului (compatibil cu Java 8+)
-        InputStream inputStream = filePart.getInputStream();
-        byte[] fileContent = new byte[(int) filePart.getSize()];
-        inputStream.read(fileContent);
-        inputStream.close();
+        if (filePart != null && filePart.getSize() > 0) {
+            String fileName = filePart.getSubmittedFileName();
+            String fileType = filePart.getContentType();
 
-        carsBean.addPhotoToCar(carId, filename, fileType, fileContent);
+            // Read the file content
+            InputStream fileContent = filePart.getInputStream();
+            byte[] fileBytes = fileContent.readAllBytes();
 
+            // Save the photo to the database
+            carsBean.addPhotoToCar(carId, fileName, fileType, fileBytes);
+        }
+
+        // Redirect back to the Cars page
         response.sendRedirect(request.getContextPath() + "/Cars");
     }
 }

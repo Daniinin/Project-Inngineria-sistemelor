@@ -6,10 +6,10 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import parkinglot.common.CarDto;
-import parkinglot.entities.Car;
-import parkinglot.entities.User;
-import parkinglot.entities.CarPhoto;
 import parkinglot.common.CarPhotoDto;
+import parkinglot.entities.Car;
+import parkinglot.entities.CarPhoto;
+import parkinglot.entities.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -101,9 +101,9 @@ public class CarsBean {
         }
     }
 
+    // METODĂ PENTRU ADĂUGARE POZĂ
     public void addPhotoToCar(Long carId, String filename, String fileType, byte[] fileContent) {
         LOG.info("addPhotoToCar");
-
         CarPhoto photo = new CarPhoto();
         photo.setFilename(filename);
         photo.setFileType(fileType);
@@ -111,18 +111,33 @@ public class CarsBean {
 
         Car car = entityManager.find(Car.class, carId);
 
-        // Dacă mașina are deja o poză, șterge-o
+        // Dacă mașina are deja o poză, o ștergem mai întâi
         if (car.getPhoto() != null) {
-            entityManager.remove(car.getPhoto());
+            CarPhoto oldPhoto = car.getPhoto();
+            car.setPhoto(null);
+            entityManager.remove(oldPhoto);
         }
 
         car.setPhoto(photo);
         photo.setCar(car);
-
         entityManager.persist(photo);
     }
 
+    // METODĂ PENTRU ȘTERGERE POZĂ
+    public void deleteCarPhoto(Long carId) {
+        LOG.info("deleteCarPhoto");
+        Car car = entityManager.find(Car.class, carId);
+
+        if (car.getPhoto() != null) {
+            CarPhoto photo = car.getPhoto();
+            car.setPhoto(null);
+            entityManager.remove(photo);
+        }
+    }
+
+    // METODĂ PENTRU GĂSIRE POZĂ
     public CarPhotoDto findPhotoByCarId(Long carId) {
+        LOG.info("findPhotoByCarId");
         List<CarPhoto> photos = entityManager
                 .createQuery("SELECT p FROM CarPhoto p WHERE p.car.id = :id", CarPhoto.class)
                 .setParameter("id", carId)
@@ -133,19 +148,7 @@ public class CarsBean {
         }
 
         CarPhoto photo = photos.get(0);
-        return new CarPhotoDto(
-                photo.getId(),
-                photo.getFilename(),
-                photo.getFileType(),
-                photo.getFileContent()
-        );
+        return new CarPhotoDto(photo.getId(), photo.getFilename(), photo.getFileType(), photo.getFileContent());
     }
 
-    public int countFreeParkingSpots() {
-        long totalCars = (long) entityManager
-                .createQuery("SELECT COUNT(c) FROM Car c")
-                .getSingleResult();
-
-        return 50 - (int) totalCars;
-    }
 }

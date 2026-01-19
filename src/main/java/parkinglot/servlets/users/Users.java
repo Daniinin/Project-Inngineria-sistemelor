@@ -1,4 +1,4 @@
-package parkinglot.servlet.user;
+package parkinglot.servlets.users;
 
 import parkinglot.ejb.InvoiceBean;
 import parkinglot.ejb.UsersBean;
@@ -15,8 +15,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @WebServlet(name = "Users", value = "/Users")
@@ -40,36 +39,39 @@ public class Users extends HttpServlet {
             throws ServletException, IOException {
 
         request.setAttribute("users", usersBean.findAllUsers());
+
+        // Obține usernames pentru userii selectați pentru facturare
+        if (invoiceBean.getUserIds() != null && !invoiceBean.getUserIds().isEmpty()) {
+            List<String> invoices = usersBean.findUsernamesByUserIds(invoiceBean.getUserIds());
+            request.setAttribute("invoices", invoices);
+        }
+
         request.setAttribute("activePage", "Users");
-
-        // Obține username-urile utilizatorilor facturați
-        request.setAttribute("invoices",
-                usersBean.findUsernamesByUserIds(invoiceBean.getUserIds()));
-
-        request.getRequestDispatcher("/WEB-INF/pages/user/users.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/pages/users/users.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Preia ID-urile utilizatorilor selectați din formular
-        String[] userIdsAsString = request.getParameterValues("user_ids");
+        // Preia valorile checkboxurilor
+        String[] userIdsArray = request.getParameterValues("user_ids");
 
-        if (userIdsAsString != null) {
-            // Convertește String[] în Set<Long>
-            Set<Long> userIds = Arrays.stream(userIdsAsString)
-                    .map(Long::parseLong)
-                    .collect(Collectors.toSet());
+        if (userIdsArray != null) {
+            // Convertește String[] în List<Long>
+            List<Long> userIds = Arrays.stream(userIdsArray)
+                    .map(Long::valueOf)
+                    .collect(Collectors.toList());
 
-            // Salvează în InvoiceBean (stare păstrată în sesiune)
-            invoiceBean.setUserIds(userIds);
+            // Salvează în InvoiceBean
+            invoiceBean.getUserIds().clear();
+            invoiceBean.getUserIds().addAll(userIds);
         } else {
             // Dacă nu e nimic selectat, golește lista
-            invoiceBean.setUserIds(new HashSet<>());
+            invoiceBean.getUserIds().clear();
         }
 
-        // Redirect la pagina Users
+        // Redirectează înapoi la GET
         response.sendRedirect(request.getContextPath() + "/Users");
     }
 }

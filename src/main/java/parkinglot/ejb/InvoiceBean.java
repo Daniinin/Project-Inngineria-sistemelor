@@ -12,7 +12,6 @@ public class InvoiceBean implements Serializable {
 
     private Set<Long> userIds = new HashSet<>();
 
-    // Getters și Setters
     public Set<Long> getUserIds() {
         return userIds;
     }

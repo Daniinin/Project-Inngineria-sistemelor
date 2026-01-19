@@ -10,7 +10,6 @@ public class CarPhoto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "filename")
     private String filename;
 
     @Column(name = "file_type")
@@ -24,11 +23,7 @@ public class CarPhoto {
     @JoinColumn(name = "car_id")
     private Car car;
 
-    // Constructor gol
-    public CarPhoto() {
-    }
-
-    // Getters și Setters
+    // Getters and Setters
     public Long getId() {
         return id;
     }

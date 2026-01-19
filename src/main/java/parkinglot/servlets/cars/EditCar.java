@@ -1,4 +1,4 @@
-package parkinglot.servlet.car;
+package parkinglot.servlets.cars;
 
 import jakarta.inject.Inject;
 import jakarta.servlet.ServletException;
@@ -16,7 +16,7 @@ import parkinglot.ejb.UsersBean;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet(name = "parkinglot.servlet.car.EditCar", value = "/parkinglot.servlet.car.EditCar")
+@WebServlet(name = "EditCar", value = "/EditCar")
 @ServletSecurity(value = @HttpConstraint(rolesAllowed = {"WRITE_CARS"}))
 public class EditCar extends HttpServlet {
 
@@ -41,7 +41,7 @@ public class EditCar extends HttpServlet {
         request.setAttribute("users", users);
 
         // Forward către pagina de editare
-        request.getRequestDispatcher("/WEB-INF/pages/car/editCar.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/pages/cars/editCar.jsp").forward(request, response);
     }
 
     @Override
@@ -57,6 +57,6 @@ public class EditCar extends HttpServlet {
         carsBean.updateCar(carId, licensePlate, parkingSpot, ownerId);
 
         // Redirect înapoi la lista de mașini
-        response.sendRedirect(request.getContextPath() + "/parkinglot.servlet.car.Cars");
+        response.sendRedirect(request.getContextPath() + "/Cars");
     }
 }
